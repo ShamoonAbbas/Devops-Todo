@@ -3,10 +3,10 @@ version: '3.8'
 services:
   mongo:
     image: mongo:latest
-    container_name: mongo
+    container_name: mongo-part2
     restart: unless-stopped
     ports:
-      - "27017:27017"
+      - "28017:27017"
     volumes:
       - mongo_data:/data/db
     environment:
@@ -14,7 +14,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-secretpassword}
     command: ["--auth", "--bind_ip_all"]
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:28017/test --quiet
       interval: 30s
       timeout: 10s
       retries: 3
@@ -25,22 +25,22 @@ services:
       context: ./todo_backend
       dockerfile: Dockerfile
       args:
-        - MONGODB_URI=mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-secretpassword}@mongo:27017/todos?authSource=admin
+        - MONGODB_URI=mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-secretpassword}@mongo:28017/todos?authSource=admin
         - NODE_ENV=production
-    container_name: backend
+    container_name: backend-part2
     restart: unless-stopped
     environment:
-      - MONGODB_URI=mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-secretpassword}@mongo:27017/todos?authSource=admin
+      - MONGODB_URI=mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-secretpassword}@mongo:28017/todos?authSource=admin
       - NODE_ENV=production
       - PORT=5000
-      - CORS_ORIGIN=${CORS_ORIGIN:-http://3.84.49.79:3000}
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://3.84.49.79:3100}
     ports:
-      - '5000:5000'
+      - '5100:5000'
     depends_on:
       mongo:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://3.84.49.79:5000/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://3.84.49.79:5100/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -53,18 +53,18 @@ services:
       args:
         - REACT_APP_API_URL=${API_URL:-http://3.84.49.79:5000}
         - NODE_ENV=production
-    container_name: frontend
+    container_name: frontend-part2
     restart: unless-stopped
     ports:
-      - '3000:3000'
+      - '3100:3000'
     environment:
-      - REACT_APP_API_URL=${API_URL:-http://3.84.49.79:5000}
+      - REACT_APP_API_URL=${API_URL:-http://3.84.49.79:5100}
       - NODE_ENV=production
     depends_on:
       backend:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3100"]
       interval: 30s
       timeout: 10s
       retries: 3
