@@ -2,6 +2,14 @@
 FROM node:18-alpine as build
 WORKDIR /app
 
+# Build arguments
+ARG REACT_APP_API_URL
+ARG WDS_SOCKET_PORT
+
+# Set environment variables
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
+ENV WDS_SOCKET_PORT=$WDS_SOCKET_PORT
+
 # Install dependencies
 COPY package*.json ./
 RUN npm install
