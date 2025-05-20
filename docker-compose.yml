@@ -10,7 +10,9 @@ services:
       - mongo_data:/data/db
 
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: ./backend/Dockerfile
     container_name: backend
     ports:
       - '5000:5000'
@@ -20,10 +22,14 @@ services:
       - mongo
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: ./frontend/Dockerfile
     container_name: frontend
     ports:
-      - '3000:80'
+      - '3000:3000'  # Changed from 3000:80 to 3000:3000
+    environment:
+      - WDS_SOCKET_PORT=0  # Required for React development server in Docker
     depends_on:
       - backend
 
