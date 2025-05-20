@@ -12,7 +12,7 @@ services:
   backend:
     build:
       context: ./todo_backend
-      dockerfile: ./todo_backend/Dockerfile
+      dockerfile: Dockerfile
     container_name: backend
     ports:
       - '5000:5000'
@@ -24,7 +24,7 @@ services:
   frontend:
     build:
       context: ./todo_frontend
-      dockerfile: ./todo_frontend/Dockerfile
+      dockerfile: Dockerfile
     container_name: frontend
     ports:
       - '3000:3000'  # Changed from 3000:80 to 3000:3000
