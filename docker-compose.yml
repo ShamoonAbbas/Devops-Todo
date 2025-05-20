@@ -51,7 +51,7 @@ services:
       context: ./todo_frontend
       dockerfile: Dockerfile
       args:
-        - REACT_APP_API_URL=${API_URL:-http://3.84.49.79:5000}
+        - REACT_APP_API_URL=${API_URL:-http://3.84.49.79:5100}
         - NODE_ENV=production
     container_name: frontend-part2
     restart: unless-stopped
