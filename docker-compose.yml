@@ -4,6 +4,8 @@ services:
   mongo:
     image: mongo
     container_name: mongo
+    ports:
+      - "27017:27017"  # Add this to expose MongoDB to host machine
     volumes:
       - mongo_data:/data/db
 
@@ -26,13 +28,13 @@ services:
       context: ./todo_frontend
       dockerfile: Dockerfile
       args:
-        - REACT_APP_API_URL=http://backend:5000
+        - REACT_APP_API_URL=http://3.84.49.79:5000
         - WDS_SOCKET_PORT=0
     container_name: frontend
     ports:
       - '3000:3000'
     environment:
-      - REACT_APP_API_URL=http://backend:5000
+      - REACT_APP_API_URL=http://3.84.49.79:5000
       - WDS_SOCKET_PORT=0
     depends_on:
       - backend
