@@ -11,10 +11,10 @@ services:
       - mongo2_data:/data/db
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME:-admin}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-secretpassword}    command: ["--auth", "--bind_ip_all"]
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-secretpassword}
+    command: ["--auth", "--bind_ip_all"]
     healthcheck:
-      test: >
-        mongosh admin --port 27017 -u "$$MONGO_INITDB_ROOT_USERNAME" -p "$$MONGO_INITDB_ROOT_PASSWORD" --quiet --eval 'db.runCommand("ping").ok'
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
       interval: 30s
       timeout: 10s
       retries: 3
