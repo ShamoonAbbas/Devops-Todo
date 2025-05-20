@@ -12,8 +12,15 @@ const Home = () => {
 
     useEffect(() => {
         axios.get(`${API_URL}/get`)
-            .then(result => setTodos(result.data))
-            .catch(err => console.log(err));
+            .then(result => {
+                // Ensure we're working with an array
+                const data = Array.isArray(result.data) ? result.data : [];
+                setTodos(data);
+            })
+            .catch(err => {
+                console.log(err);
+                setTodos([]); // Set empty array on error
+            });
     }, []);
 
     const edit = (id) => {
