@@ -2,42 +2,74 @@ version: '3.8'
 
 services:
   mongo:
-    image: mongo
+    image: mongo:latest
     container_name: mongo
+    restart: unless-stopped
     ports:
-      - "27017:27017"  # Add this to expose MongoDB to host machine
+      - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME:-admin}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-secretpassword}
+    command: ["--auth", "--bind_ip_all"]
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   backend:
     build:
       context: ./todo_backend
       dockerfile: Dockerfile
       args:
-        - MONGO_URI=mongodb://mongo:27017/todos
+        - MONGO_URI=mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-secretpassword}@mongo:27017/todos?authSource=admin
+        - NODE_ENV=production
     container_name: backend
+    restart: unless-stopped
     environment:
-      - MONGO_URI=mongodb://mongo:27017/todos
+      - MONGO_URI=mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-secretpassword}@mongo:27017/todos?authSource=admin
+      - NODE_ENV=production
+      - PORT=5000
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:3000}
     ports:
-      - '5000:5000'  # Add this line to expose the backend port
+      - '5000:5000'
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   frontend:
     build:
       context: ./todo_frontend
       dockerfile: Dockerfile
       args:
-        - REACT_APP_API_URL=http://3.84.49.79:5000
-        - WDS_SOCKET_PORT=0
+        - REACT_APP_API_URL=${API_URL:-http://localhost:5000}
+        - NODE_ENV=production
     container_name: frontend
+    restart: unless-stopped
     ports:
       - '3000:3000'
     environment:
-      - REACT_APP_API_URL=http://3.84.49.79:5000
-      - WDS_SOCKET_PORT=0
+      - REACT_APP_API_URL=${API_URL:-http://localhost:5000}
+      - NODE_ENV=production
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 volumes:
   mongo_data:
+    name: todo_mongo_data
