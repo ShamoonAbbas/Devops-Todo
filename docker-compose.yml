@@ -25,12 +25,12 @@ services:
       context: ./todo_backend
       dockerfile: Dockerfile
       args:
-        - MONGODB_URI=mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-secretpassword}@mongo:28017/todos?authSource=admin
+        - MONGODB_URI=mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-secretpassword}@mongo:27017/todos?authSource=admin
         - NODE_ENV=production
     container_name: backend-part2
     restart: unless-stopped
     environment:
-      - MONGODB_URI=mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-secretpassword}@mongo:28017/todos?authSource=admin
+      - MONGODB_URI=mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-secretpassword}@mongo:27017/todos?authSource=admin
       - NODE_ENV=production
       - PORT=5000
       - CORS_ORIGIN=${CORS_ORIGIN:-http://3.84.49.79:3100}
