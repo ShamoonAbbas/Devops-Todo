@@ -8,15 +8,16 @@ const Home = () => {
     const [todos, setTodos] = useState([]);
     const [updatetask, setUpdatetask] = useState('');
     const [taskid, setTaskid] = useState('');
+    const API_URL = process.env.REACT_APP_API_URL;
 
     useEffect(() => {
-        axios.get('http://localhost:5000/get')
+        axios.get(`${API_URL}/get`)
             .then(result => setTodos(result.data))
             .catch(err => console.log(err));
     }, []);
 
     const edit = (id) => {
-        axios.put(`http://localhost:5000/edit/${id}`)
+        axios.put(`${API_URL}/edit/${id}`)
             .then(result => {
                 console.log(result.data);
                 const updatedTodos = todos.map(todo => {
@@ -31,7 +32,7 @@ const Home = () => {
     };
 
     const Update = (id, updatedTask) => {
-        axios.put(`http://localhost:5000/update/${id}`, { task: updatedTask })
+        axios.put(`${API_URL}/update/${id}`, { task: updatedTask })
             .then(result => {
                 console.log(result.data);
                 const updatedTodos = todos.map(todo => {
@@ -49,7 +50,7 @@ const Home = () => {
     };
 
     const Hdelete = (id) => {
-        axios.delete(`http://localhost:5000/delete/${id}`)
+        axios.delete(`${API_URL}/delete/${id}`)
             .then(result => {
                 console.log(result.data);
                 const updatedTodos = todos.filter(todo => todo._id !== id);

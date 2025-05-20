@@ -4,9 +4,10 @@ import axios from 'axios';
 
 const Create = () => {
     const [task, setTask] = useState('');
+    const API_URL = process.env.REACT_APP_API_URL;
 
     const createTask = () => {
-        axios.post('http://localhost:5000/add', { task: task.trim() })
+        axios.post(`${API_URL}/add`, { task: task.trim() })
             .then(result => {
                 console.log(result.data);
                 window.location.reload();
