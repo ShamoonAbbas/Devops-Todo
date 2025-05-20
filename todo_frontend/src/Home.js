@@ -12,16 +12,9 @@ const Home = () => {
 
     useEffect(() => {
         axios.get(`${API_URL}/get`)
-            .then(result => {
-                // Ensure we're working with an array
-                const data = Array.isArray(result.data) ? result.data : [];
-                setTodos(data);
-            })
-            .catch(err => {
-                console.log(err);
-                setTodos([]); // Set empty array on error
-            });
-    }, []);
+            .then(result => setTodos(result.data))
+            .catch(err => console.log(err));
+    }, [API_URL]); // Add API_URL to the dependency array
 
     const edit = (id) => {
         axios.put(`${API_URL}/edit/${id}`)

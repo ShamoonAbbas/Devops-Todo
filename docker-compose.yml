@@ -14,10 +14,10 @@ services:
       context: ./todo_backend
       dockerfile: Dockerfile
       args:
-        - MONGO_URI=mongodb://mongo:27017/todos
+        - MONGO_URI=mongodb://3.84.49.79:27017/todos
     container_name: backend
     environment:
-      - MONGO_URI=mongodb://mongo:27017/todos
+      - MONGO_URI=mongodb://3.84.49.79:27017/todos
     ports:
       - '5000:5000'  # Add this line to expose the backend port
     depends_on:
