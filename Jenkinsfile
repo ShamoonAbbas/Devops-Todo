@@ -135,7 +135,28 @@ pipeline {
         def testStatus = currentBuild.result ?: 'SUCCESS'
         
         // Determine email recipients
-        def emailRecipients = env.CHANGE_AUTHOR_EMAIL ?: 'no-one@nothing.suiii'
+        def emailRecipients = 'no-one@nothing.suiii'
+
+        try {
+          if (env.CHANGE_AUTHOR_EMAIL) {
+            // For pull requests
+            emailRecipients = env.CHANGE_AUTHOR_EMAIL
+          } else {
+            // For regular commits - get from git
+            dir('part-2') {
+              def gitEmail = sh(
+                script: 'git log -1 --pretty=format:"%ae"',
+                returnStdout: true
+              ).trim()
+              
+              if (gitEmail && gitEmail != '') {
+                emailRecipients = gitEmail
+              }
+            }
+          }
+        } catch (Exception e) {
+          echo "Could not determine committer email: ${e.getMessage()}"
+        }
         
         // Count test results if available
         def testSummary = 'Test summary not available'
