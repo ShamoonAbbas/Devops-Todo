@@ -1,0 +1,59 @@
+# Alternative Dockerfile using Selenium standalone Chrome
+FROM node:18-slim
+
+# Install necessary system dependencies
+RUN apt-get update && apt-get install -y \
+    wget \
+    gnupg \
+    ca-certificates \
+    procps \
+    libxss1 \
+    libnss3 \
+    libatk-bridge2.0-0 \
+    libgtk-3-0 \
+    libgbm-dev \
+    libasound2 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Google Chrome
+RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/googlechrome-linux-keyring.gpg \
+    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/googlechrome-linux-keyring.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
+    && apt-get update \
+    && apt-get install -y google-chrome-stable \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app/testcases
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy all test files
+COPY . .
+
+# Create directories for test outputs
+RUN mkdir -p screenshots test-results logs
+
+# Set environment variables
+ENV NODE_ENV=test
+ENV CHROME_BIN=/usr/bin/google-chrome
+ENV DISPLAY=:99
+
+# Add a non-root user for security
+RUN groupadd -r testuser && useradd -r -g testuser -G audio,video testuser \
+    && mkdir -p /home/testuser/Downloads \
+    && chown -R testuser:testuser /home/testuser \
+    && chown -R testuser:testuser /app/testcases
+
+# Switch to non-root user
+USER testuser
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD node -e "console.log('Test container is healthy')" || exit 1
+
+# Default command
+CMD ["npm", "test"]

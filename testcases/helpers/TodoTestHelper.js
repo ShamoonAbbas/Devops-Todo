@@ -4,35 +4,105 @@ const chrome = require('selenium-webdriver/chrome');
 class TodoTestHelper {
     constructor() {
         this.driver = null;
-        this.baseUrl = 'http://localhost:3100'; // Frontend URL
-        this.apiUrl = 'http://localhost:5100';  // Backend URL
+        this.baseUrl = this.getEnvironmentUrl('FRONTEND_URL', 'http://localhost:3100');
+        this.apiUrl = this.getEnvironmentUrl('BACKEND_URL', 'http://localhost:5100');
+        this.useRemoteWebDriver = process.env.USE_SELENIUM_GRID === 'true';
+        this.seleniumHubUrl = process.env.SELENIUM_HUB_URL || 'http://selenium-hub:4444/wd/hub';
+    }
+
+    getEnvironmentUrl(envVar, defaultUrl) {
+        const envUrl = process.env[envVar];
+        if (envUrl) return envUrl;
+        
+        // If running in Docker, use host.docker.internal
+        if (process.env.NODE_ENV === 'test' && process.env.DOCKER_ENV === 'true') {
+            return defaultUrl.replace('localhost', 'host.docker.internal');
+        }
+        
+        return defaultUrl;
     }
 
     async setup() {
         const chromeOptions = new chrome.Options();
+        
+        // Common Chrome options
         chromeOptions.addArguments('--headless');
         chromeOptions.addArguments('--no-sandbox');
         chromeOptions.addArguments('--disable-dev-shm-usage');
         chromeOptions.addArguments('--disable-gpu');
         chromeOptions.addArguments('--window-size=1920,1080');
+        chromeOptions.addArguments('--disable-extensions');
+        chromeOptions.addArguments('--disable-web-security');
+        chromeOptions.addArguments('--disable-features=VizDisplayCompositor');
+        chromeOptions.addArguments('--remote-debugging-port=9222');
+        
+        // Additional options for Docker environment
+        if (process.env.NODE_ENV === 'test') {
+            chromeOptions.addArguments('--disable-background-timer-throttling');
+            chromeOptions.addArguments('--disable-backgrounding-occluded-windows');
+            chromeOptions.addArguments('--disable-renderer-backgrounding');
+            chromeOptions.addArguments('--disable-ipc-flooding-protection');
+            chromeOptions.addArguments('--memory-pressure-off');
+        }
 
-        this.driver = await new Builder()
-            .forBrowser('chrome')
-            .setChromeOptions(chromeOptions)
-            .build();
+        let builder = new Builder().forBrowser('chrome');
 
-        await this.driver.manage().setTimeouts({ implicit: 10000 });
-    }
+        if (this.useRemoteWebDriver) {
+            // Use Selenium Grid
+            builder = builder.usingServer(this.seleniumHubUrl);
+            console.log(`Using Selenium Grid at: ${this.seleniumHubUrl}`);
+        } else {
+            // Use local Chrome
+            builder = builder.setChromeOptions(chromeOptions);
+        }
 
-    async teardown() {
+        this.driver = await builder.build();
+        await this.driver.manage().setTimeouts({ 
+            implicit: 10000,
+            pageLoad: 30000,
+            script: 30000 
+        });
+    }    async teardown() {
         if (this.driver) {
-            await this.driver.quit();
+            try {
+                await this.driver.quit();
+            } catch (error) {
+                console.error('Error during driver teardown:', error.message);
+            }
         }
     }
 
     async navigateToApp() {
-        await this.driver.get(this.baseUrl);
-        await this.driver.wait(until.titleContains('React App'), 10000);
+        try {
+            console.log(`Navigating to: ${this.baseUrl}`);
+            await this.driver.get(this.baseUrl);
+            await this.driver.wait(until.titleContains('React App'), 15000);
+        } catch (error) {
+            console.error(`Failed to navigate to app: ${error.message}`);
+            throw error;
+        }
+    }
+
+    async takeScreenshot(filename) {
+        try {
+            const screenshot = await this.driver.takeScreenshot();
+            const fs = require('fs');
+            const path = require('path');
+            
+            const screenshotDir = path.join(__dirname, '..', 'screenshots');
+            if (!fs.existsSync(screenshotDir)) {
+                fs.mkdirSync(screenshotDir, { recursive: true });
+            }
+            
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const screenshotPath = path.join(screenshotDir, `${filename || 'screenshot'}-${timestamp}.png`);
+            
+            fs.writeFileSync(screenshotPath, screenshot, 'base64');
+            console.log(`Screenshot saved: ${screenshotPath}`);
+            return screenshotPath;
+        } catch (error) {
+            console.error('Failed to take screenshot:', error.message);
+        }
     }
 
     async addTodo(taskText) {

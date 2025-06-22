@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  # Test runner service
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: todo-test-runner
+    volumes:
+      # Mount test results and screenshots to host
+      - ./test-results:/app/testcases/test-results
+      - ./screenshots:/app/testcases/screenshots
+      - ./logs:/app/testcases/logs
+      # Mount source code for development (optional)
+      - .:/app/testcases
+    environment:
+      # Test configuration
+      - NODE_ENV=test
+      - TEST_TIMEOUT=30000
+      - FRONTEND_URL=http://host.docker.internal:3100
+      - BACKEND_URL=http://host.docker.internal:5100
+      # Chrome configuration for Docker
+      - CHROME_BIN=/usr/bin/google-chrome
+      - CHROME_PATH=/usr/bin/google-chrome
+    networks:
+      - todo-test-network
+    depends_on:
+      - selenium-hub
+    command: npm test
+    # Alternative commands:
+    # command: npm run test:report
+    # command: node run-tests.js
+    # command: npm run test:single test/01-basic-functionality.test.js
+
+  # Selenium Hub for coordinating tests
+  selenium-hub:
+    image: selenium/hub:4.15.0
+    container_name: selenium-hub
+    ports:
+      - "4444:4444"
+      - "4442:4442"
+      - "4443:4443"
+    environment:
+      - GRID_MAX_SESSION=5
+      - GRID_BROWSER_TIMEOUT=30
+      - GRID_TIMEOUT=30
+    networks:
+      - todo-test-network
+
+  # Chrome browser node
+  chrome-node:
+    image: selenium/node-chrome:4.15.0
+    container_name: chrome-node
+    depends_on:
+      - selenium-hub
+    environment:
+      - HUB_HOST=selenium-hub
+      - HUB_PORT=4444
+      - NODE_MAX_INSTANCES=3
+      - NODE_MAX_SESSION=3
+    volumes:
+      - /dev/shm:/dev/shm
+    networks:
+      - todo-test-network
+
+  # Test report server (optional)
+  test-reports:
+    image: nginx:alpine
+    container_name: test-reports-server
+    ports:
+      - "8080:80"
+    volumes:
+      - ./test-results:/usr/share/nginx/html/reports:ro
+      - ./screenshots:/usr/share/nginx/html/screenshots:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - todo-test-network
+    depends_on:
+      - test-runner
+    profiles:
+      - reports
+
+networks:
+  todo-test-network:
+    driver: bridge
+
+volumes:
+  test-results:
+  screenshots:
+  logs:

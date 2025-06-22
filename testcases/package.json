@@ -8,7 +8,13 @@
     "test:single": "mocha --timeout 30000",
     "test:watch": "mocha test/*.js --timeout 30000 --watch",
     "test:report": "mocha test/*.js --timeout 30000 --reporter mochawesome",
-    "run": "node run-tests.js"
+    "run": "node run-tests.js",
+    "docker:build": "docker build -t todo-tests .",
+    "docker:test": "docker-compose up --build test-runner",
+    "docker:full": "docker-compose -f docker-compose.full.yml --profile test up --build",
+    "docker:grid": "docker-compose -f docker-compose.full.yml --profile grid-test up --build",
+    "docker:reports": "docker-compose --profile reports up -d test-reports",
+    "docker:cleanup": "docker-compose down -v && docker system prune -f"
   },
   "dependencies": {
     "selenium-webdriver": "^4.15.0",
