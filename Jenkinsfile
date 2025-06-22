@@ -10,7 +10,7 @@ pipeline {
   stages {
     stage('Clone Repository') {
       steps {
-        dir('part-2') {
+        dir('ToDo') {
           git branch: 'main', url: 'https://github.com/ShamoonAbbas/Devops-Todo.git'
         }
       }
@@ -50,7 +50,7 @@ pipeline {
 
     stage('Run Tests') {
       steps {
-        dir('part-2') {
+        dir('ToDo') {
           script {
             try {
               echo 'Setting up test environment...'
@@ -85,7 +85,7 @@ pipeline {
       post {
         always {
           // Archive test results and artifacts
-          dir('part-2') {
+          dir('ToDo') {
             archiveArtifacts artifacts: 'testcases/test-results/**/*', allowEmptyArchive: true
             archiveArtifacts artifacts: 'testcases/screenshots/**/*', allowEmptyArchive: true
             archiveArtifacts artifacts: 'testcases/logs/**/*', allowEmptyArchive: true
@@ -112,7 +112,7 @@ pipeline {
           script {
             echo 'Tests failed - collecting additional debugging information'
             sh '''
-              cd part-2
+              cd ToDo
               echo "=== Docker Container Status ===" >> testcases/logs/debug.log
               docker-compose -p $PROJECT_NAME ps >> testcases/logs/debug.log 2>&1 || true
               
@@ -143,7 +143,7 @@ pipeline {
             emailRecipients = env.CHANGE_AUTHOR_EMAIL
           } else {
             // For regular commits - get from git
-            dir('part-2') {
+            dir('ToDo') {
               def gitEmail = sh(
                 script: 'git log -1 --pretty=format:"%ae"',
                 returnStdout: true
@@ -161,8 +161,8 @@ pipeline {
         // Count test results if available
         def testSummary = 'Test summary not available'
         try {
-          if (fileExists('part-2/testcases/logs/test-execution.log')) {
-            def logContent = readFile('part-2/testcases/logs/test-execution.log')
+          if (fileExists('ToDo/testcases/logs/test-execution.log')) {
+            def logContent = readFile('ToDo/testcases/logs/test-execution.log')
             def passCount = (logContent =~ /(\d+) passing/).collect { it[1] }
             def failCount = (logContent =~ /(\d+) failing/).collect { it[1] }
             
@@ -224,7 +224,7 @@ pipeline {
           mimeType: 'text/html',
           to: emailRecipients,
           attachLog: testStatus != 'SUCCESS',
-          attachmentsPattern: testStatus != 'SUCCESS' ? 'part-2/testcases/logs/debug.log' : ''
+          attachmentsPattern: testStatus != 'SUCCESS' ? 'ToDo/testcases/logs/debug.log' : ''
         )
       }
     }
@@ -239,17 +239,6 @@ pipeline {
       echo '❌ Pipeline failed!'
       echo '📋 Check test reports and logs for details'
       echo '🔍 Debug logs attached to email notification'
-    }
-    
-    cleanup {
-      script {
-        echo 'Cleaning up test environment...'
-        sh '''
-          cd part-2 || true
-          docker-compose -p $PROJECT_NAME logs > jenkins-docker-logs.txt 2>&1 || true
-          docker-compose -p $PROJECT_NAME down -v --remove-orphans || true
-        '''
-      }
     }
   }
 }

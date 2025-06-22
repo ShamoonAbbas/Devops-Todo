@@ -20,49 +20,58 @@ class TodoTestHelper {
         }
         
         return defaultUrl;
-    }
+    }    async setup() {
+        try {
+            console.log('Starting WebDriver setup...');
+            const chromeOptions = new chrome.Options();
+            
+            // Common Chrome options
+            chromeOptions.addArguments('--headless');
+            chromeOptions.addArguments('--no-sandbox');
+            chromeOptions.addArguments('--disable-dev-shm-usage');
+            chromeOptions.addArguments('--disable-gpu');
+            chromeOptions.addArguments('--window-size=1920,1080');
+            chromeOptions.addArguments('--disable-extensions');
+            chromeOptions.addArguments('--disable-web-security');
+            chromeOptions.addArguments('--disable-features=VizDisplayCompositor');
+            chromeOptions.addArguments('--remote-debugging-port=9222');
+            
+            // Additional options for Docker environment
+            if (process.env.NODE_ENV === 'test') {
+                chromeOptions.addArguments('--disable-background-timer-throttling');
+                chromeOptions.addArguments('--disable-backgrounding-occluded-windows');
+                chromeOptions.addArguments('--disable-renderer-backgrounding');
+                chromeOptions.addArguments('--disable-ipc-flooding-protection');
+                chromeOptions.addArguments('--memory-pressure-off');
+            }
 
-    async setup() {
-        const chromeOptions = new chrome.Options();
-        
-        // Common Chrome options
-        chromeOptions.addArguments('--headless');
-        chromeOptions.addArguments('--no-sandbox');
-        chromeOptions.addArguments('--disable-dev-shm-usage');
-        chromeOptions.addArguments('--disable-gpu');
-        chromeOptions.addArguments('--window-size=1920,1080');
-        chromeOptions.addArguments('--disable-extensions');
-        chromeOptions.addArguments('--disable-web-security');
-        chromeOptions.addArguments('--disable-features=VizDisplayCompositor');
-        chromeOptions.addArguments('--remote-debugging-port=9222');
-        
-        // Additional options for Docker environment
-        if (process.env.NODE_ENV === 'test') {
-            chromeOptions.addArguments('--disable-background-timer-throttling');
-            chromeOptions.addArguments('--disable-backgrounding-occluded-windows');
-            chromeOptions.addArguments('--disable-renderer-backgrounding');
-            chromeOptions.addArguments('--disable-ipc-flooding-protection');
-            chromeOptions.addArguments('--memory-pressure-off');
+            let builder = new Builder().forBrowser('chrome');
+
+            if (this.useRemoteWebDriver) {
+                // Use Selenium Grid
+                builder = builder.usingServer(this.seleniumHubUrl);
+                console.log(`Using Selenium Grid at: ${this.seleniumHubUrl}`);
+            } else {
+                // Use local Chrome
+                console.log('Using local Chrome with options:', chromeOptions.getArguments());
+                builder = builder.setChromeOptions(chromeOptions);
+            }
+
+            console.log('Building WebDriver...');
+            this.driver = await builder.build();
+            console.log('WebDriver built successfully');
+            
+            await this.driver.manage().setTimeouts({ 
+                implicit: 10000,
+                pageLoad: 30000,
+                script: 30000 
+            });
+            console.log('WebDriver setup completed');
+        } catch (error) {
+            console.error('Error during WebDriver setup:', error.message);
+            throw error;
         }
-
-        let builder = new Builder().forBrowser('chrome');
-
-        if (this.useRemoteWebDriver) {
-            // Use Selenium Grid
-            builder = builder.usingServer(this.seleniumHubUrl);
-            console.log(`Using Selenium Grid at: ${this.seleniumHubUrl}`);
-        } else {
-            // Use local Chrome
-            builder = builder.setChromeOptions(chromeOptions);
-        }
-
-        this.driver = await builder.build();
-        await this.driver.manage().setTimeouts({ 
-            implicit: 10000,
-            pageLoad: 30000,
-            script: 30000 
-        });
-    }    async teardown() {
+    }async teardown() {
         if (this.driver) {
             try {
                 await this.driver.quit();

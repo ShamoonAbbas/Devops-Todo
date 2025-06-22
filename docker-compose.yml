@@ -3,7 +3,7 @@ version: '3.8'
 services:
   mongo:
     image: mongo:latest
-    container_name: mongo-part2
+    container_name: mongo
     restart: unless-stopped
     ports:
       - "28017:27017"
@@ -19,7 +19,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-
   backend:
     build:
       context: ./todo_backend
@@ -27,7 +26,7 @@ services:
       args:
         - MONGODB_URI=mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-secretpassword}@mongo:27017/todos?authSource=admin
         - NODE_ENV=production
-    container_name: backend-part2
+    container_name: backend
     restart: unless-stopped
     environment:
       - MONGODB_URI=mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-secretpassword}@mongo:27017/todos?authSource=admin
@@ -45,7 +44,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-
   frontend:
     build:
       context: ./todo_frontend
@@ -53,7 +51,7 @@ services:
       args:
         - REACT_APP_API_URL=${API_URL:-http://54.91.190.145:5000}
         - NODE_ENV=production
-    container_name: frontend-part2
+    container_name: frontend
     restart: unless-stopped
     ports:
       - '3000:3000'
@@ -69,7 +67,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-
 volumes:
   mongo2_data:
     name: todo_mongo2_data
