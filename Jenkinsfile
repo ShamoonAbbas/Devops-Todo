@@ -135,7 +135,7 @@ pipeline {
         def testStatus = currentBuild.result ?: 'SUCCESS'
         
         // Determine email recipients
-        def emailRecipients = env.CHANGE_AUTHOR_EMAIL ?: 'devops-team@company.com'
+        def emailRecipients = env.CHANGE_AUTHOR_EMAIL ?: 'no-one@nothing.suiii'
         
         // Count test results if available
         def testSummary = 'Test summary not available'

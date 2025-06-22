@@ -4,8 +4,8 @@ const chrome = require('selenium-webdriver/chrome');
 class TodoTestHelper {
     constructor() {
         this.driver = null;
-        this.baseUrl = this.getEnvironmentUrl('FRONTEND_URL', 'http://localhost:3100');
-        this.apiUrl = this.getEnvironmentUrl('BACKEND_URL', 'http://localhost:5100');
+        this.baseUrl = this.getEnvironmentUrl('FRONTEND_URL', 'http://localhost:3000');
+        this.apiUrl = this.getEnvironmentUrl('BACKEND_URL', 'http://localhost:5000');
         this.useRemoteWebDriver = process.env.USE_SELENIUM_GRID === 'true';
         this.seleniumHubUrl = process.env.SELENIUM_HUB_URL || 'http://selenium-hub:4444/wd/hub';
     }
