@@ -1,0 +1,30 @@
+{
+  "name": "todo-app-tests",
+  "version": "1.0.0",
+  "description": "Selenium test cases for Todo application",
+  "main": "index.js",  "scripts": {
+    "setup": "node setup.js",
+    "test": "mocha test/*.js --timeout 30000",
+    "test:single": "mocha --timeout 30000",
+    "test:watch": "mocha test/*.js --timeout 30000 --watch",
+    "test:report": "mocha test/*.js --timeout 30000 --reporter mochawesome",
+    "run": "node run-tests.js"
+  },
+  "dependencies": {
+    "selenium-webdriver": "^4.15.0",
+    "mocha": "^10.2.0",
+    "chai": "^4.3.10",
+    "chromedriver": "^119.0.0"
+  },
+  "devDependencies": {
+    "mochawesome": "^7.1.3"
+  },
+  "keywords": [
+    "selenium",
+    "testing",
+    "todo",
+    "automation"
+  ],
+  "author": "Test Engineer",
+  "license": "MIT"
+}
