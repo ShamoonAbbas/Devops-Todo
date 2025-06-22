@@ -20,30 +20,18 @@ class TodoTestHelper {
         }
         
         return defaultUrl;
-    }    async setup() {
+    }
+
+    async setup() {
         try {
             console.log('Starting WebDriver setup...');
             const chromeOptions = new chrome.Options();
-            
-            // Common Chrome options
-            chromeOptions.addArguments('--headless');
+              // Essential Chrome options for testing
+            // chromeOptions.addArguments('--headless'); // Temporarily disable headless for debugging
             chromeOptions.addArguments('--no-sandbox');
             chromeOptions.addArguments('--disable-dev-shm-usage');
             chromeOptions.addArguments('--disable-gpu');
             chromeOptions.addArguments('--window-size=1920,1080');
-            chromeOptions.addArguments('--disable-extensions');
-            chromeOptions.addArguments('--disable-web-security');
-            chromeOptions.addArguments('--disable-features=VizDisplayCompositor');
-            chromeOptions.addArguments('--remote-debugging-port=9222');
-            
-            // Additional options for Docker environment
-            if (process.env.NODE_ENV === 'test') {
-                chromeOptions.addArguments('--disable-background-timer-throttling');
-                chromeOptions.addArguments('--disable-backgrounding-occluded-windows');
-                chromeOptions.addArguments('--disable-renderer-backgrounding');
-                chromeOptions.addArguments('--disable-ipc-flooding-protection');
-                chromeOptions.addArguments('--memory-pressure-off');
-            }
 
             let builder = new Builder().forBrowser('chrome');
 
@@ -53,7 +41,7 @@ class TodoTestHelper {
                 console.log(`Using Selenium Grid at: ${this.seleniumHubUrl}`);
             } else {
                 // Use local Chrome
-                console.log('Using local Chrome with options:', chromeOptions.getArguments());
+                console.log('Using local Chrome with headless mode');
                 builder = builder.setChromeOptions(chromeOptions);
             }
 
@@ -68,10 +56,12 @@ class TodoTestHelper {
             });
             console.log('WebDriver setup completed');
         } catch (error) {
-            console.error('Error during WebDriver setup:', error.message);
+            console.error('Error during WebDriver setup:', error);
             throw error;
         }
-    }async teardown() {
+    }
+
+    async teardown() {
         if (this.driver) {
             try {
                 await this.driver.quit();

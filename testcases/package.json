@@ -2,7 +2,8 @@
   "name": "todo-app-tests",
   "version": "1.0.0",
   "description": "Selenium test cases for Todo application",
-  "main": "index.js",  "scripts": {
+  "main": "index.js",
+  "scripts": {
     "setup": "node setup.js",
     "test": "mocha test/*.js --timeout 3000",
     "test:single": "mocha --timeout 3000",
@@ -17,10 +18,10 @@
     "docker:cleanup": "docker-compose down -v && docker system prune -f"
   },
   "dependencies": {
-    "selenium-webdriver": "^4.15.0",
-    "mocha": "^10.2.0",
     "chai": "^4.3.10",
-    "chromedriver": "^119.0.0"
+    "chromedriver": "^137.0.4",
+    "mocha": "^10.2.0",
+    "selenium-webdriver": "^4.15.0"
   },
   "devDependencies": {
     "mochawesome": "^7.1.3"
