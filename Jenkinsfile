@@ -32,13 +32,13 @@ pipeline {
         script {
           echo 'Waiting for application to be ready...'
           sh '''
-            timeout 300 bash -c 'until curl -f http://localhost:3100 >/dev/null 2>&1; do 
+            timeout 300 bash -c 'until curl -f http://localhost:3000 >/dev/null 2>&1; do 
               echo "Waiting for frontend..."; 
               sleep 5; 
             done'
           '''
           sh '''
-            timeout 300 bash -c 'until curl -f http://localhost:5100/health >/dev/null 2>&1; do 
+            timeout 300 bash -c 'until curl -f http://localhost:5000/health >/dev/null 2>&1; do 
               echo "Waiting for backend..."; 
               sleep 5; 
             done'
@@ -179,8 +179,8 @@ pipeline {
               
               <h3>Application URLs:</h3>
               <ul>
-                <li><strong>Frontend:</strong> <a href="http://localhost:3100">http://localhost:3100</a></li>
-                <li><strong>Backend:</strong> <a href="http://localhost:5100/health">http://localhost:5100/health</a></li>
+                <li><strong>Frontend:</strong> <a href="http://localhost:3000">http://localhost:3000</a></li>
+                <li><strong>Backend:</strong> <a href="http://localhost:5000/health">http://localhost:5000/health</a></li>
               </ul>
               
               ${testStatus == 'SUCCESS' ? 

@@ -2,12 +2,12 @@ module.exports = {
     // Environment configurations
     environments: {
         local: {
-            frontendUrl: 'http://localhost:3100',
-            backendUrl: 'http://localhost:5100'
+            frontendUrl: 'http://localhost:3000',
+            backendUrl: 'http://localhost:5000'
         },
         docker: {
-            frontendUrl: 'http://localhost:3100',
-            backendUrl: 'http://localhost:5100'
+            frontendUrl: 'http://localhost:3000',
+            backendUrl: 'http://localhost:5000'
         },
         staging: {
             frontendUrl: 'http://staging.todo-app.com',

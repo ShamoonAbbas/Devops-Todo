@@ -132,8 +132,8 @@ Next Steps:
    ${process.platform === 'win32' ? 'docker-compose.exe up -d' : 'docker-compose up -d'}
 
 2. Verify the application is accessible:
-   - Frontend: http://localhost:3100
-   - Backend:  http://localhost:5100
+   - Frontend: http://localhost:3000
+   - Backend:  http://localhost:5000
 
 3. Run the tests:
    npm test                           # Run all tests

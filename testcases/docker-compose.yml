@@ -18,8 +18,8 @@ services:
       # Test configuration
       - NODE_ENV=test
       - TEST_TIMEOUT=30000
-      - FRONTEND_URL=http://host.docker.internal:3100
-      - BACKEND_URL=http://host.docker.internal:5100
+      - FRONTEND_URL=http://host.docker.internal:3000
+      - BACKEND_URL=http://host.docker.internal:5000
       # Chrome configuration for Docker
       - CHROME_BIN=/usr/bin/google-chrome
       - CHROME_PATH=/usr/bin/google-chrome

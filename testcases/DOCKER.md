@@ -105,8 +105,8 @@ run-docker-tests.bat cleanup   # Clean up resources
 
 ```bash
 # Application URLs
-FRONTEND_URL=http://localhost:3100    # Frontend application URL
-BACKEND_URL=http://localhost:5100     # Backend API URL
+FRONTEND_URL=http://localhost:3000    # Frontend application URL
+BACKEND_URL=http://localhost:5000     # Backend API URL
 
 # Docker environment
 DOCKER_ENV=true                       # Enable Docker-specific settings
@@ -196,8 +196,8 @@ All services include health checks to ensure proper startup order:
 docker-compose -f docker-compose.full.yml ps
 
 # Manual health check
-curl http://localhost:3100  # Frontend
-curl http://localhost:5100/health  # Backend
+curl http://localhost:3000  # Frontend
+curl http://localhost:5000/health  # Backend
 curl http://localhost:4444/status  # Selenium Grid
 ```
 
@@ -208,7 +208,7 @@ curl http://localhost:4444/status  # Selenium Grid
 1. **Port Conflicts**
    ```bash
    # Check port usage
-   netstat -tulpn | grep :3100
+   netstat -tulpn | grep :3000
    
    # Stop conflicting services
    docker-compose down

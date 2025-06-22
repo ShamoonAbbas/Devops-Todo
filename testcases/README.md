@@ -58,8 +58,8 @@ Before running the tests, ensure you have:
 1. **Node.js** (version 14 or higher)
 2. **Chrome browser** installed
 3. **Todo application** running locally:
-   - Frontend on `http://localhost:3100`
-   - Backend on `http://localhost:5100`
+   - Frontend on `http://localhost:3000`
+   - Backend on `http://localhost:5000`
 
 ## Installation
 
@@ -113,8 +113,8 @@ Tests run in headless Chrome by default with the following options:
 ## Application URLs
 
 Make sure your application is running on:
-- **Frontend**: `http://localhost:3100`
-- **Backend**: `http://localhost:5100`
+- **Frontend**: `http://localhost:3000`
+- **Backend**: `http://localhost:5000`
 
 To start the application using Docker Compose:
 ```bash
@@ -139,8 +139,8 @@ npx mocha test/*.js --timeout 30000 --reporter mochawesome
    - Update chromedriver: `npm update chromedriver`
 
 2. **Application Not Running**
-   - Verify frontend is accessible at `http://localhost:3100`
-   - Verify backend is accessible at `http://localhost:5100`
+   - Verify frontend is accessible at `http://localhost:3000`
+   - Verify backend is accessible at `http://localhost:5000`
    - Check Docker containers are running: `docker ps`
 
 3. **Test Timeouts**
