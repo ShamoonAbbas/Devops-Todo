@@ -26,8 +26,9 @@ class TodoTestHelper {
         try {
             console.log('Starting WebDriver setup...');
             const chromeOptions = new chrome.Options();
-              // Essential Chrome options for testing
-            // chromeOptions.addArguments('--headless'); // Temporarily disable headless for debugging
+            
+            // Essential Chrome options for headless testing
+            chromeOptions.addArguments('--headless');
             chromeOptions.addArguments('--no-sandbox');
             chromeOptions.addArguments('--disable-dev-shm-usage');
             chromeOptions.addArguments('--disable-gpu');
