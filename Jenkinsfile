@@ -77,16 +77,6 @@ pipeline {
             archiveArtifacts artifacts: 'testcases/screenshots/**/*', allowEmptyArchive: true
             archiveArtifacts artifacts: 'testcases/logs/**/*', allowEmptyArchive: true
             
-            // Publish HTML test reports if available
-            publishHTML([
-              allowMissing: false,
-              alwaysLinkToLastBuild: true,
-              keepAll: true,
-              reportDir: 'testcases/test-results',
-              reportFiles: '*.html',
-              reportName: 'Test Report'
-            ])
-            
             // Publish test results if JUnit XML is available
             script {
               if (fileExists('testcases/test-results/*.xml')) {
